@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { prisma } from '../../lib/prisma';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const createUser = async (
   req: Request,
@@ -62,13 +63,22 @@ export const loginUser = async (
       return;
     }
 
+    const payload = {
+      id: result.id,
+      email: result.email,
+      role: result.role,
+    };
+
     const match = await bcrypt.compare(password, result.password);
 
     if (match) {
-      res.status(200).send({
-        message: 'oi',
+      const token = jwt.sign(payload, process.env.JWT_SECRETE as string, {
+        expiresIn: '1d',
       });
-      // login and generate JWT
+      res.status(200).send({
+        message: 'Login Successful',
+        token: token,
+      });
     } else {
       res.status(401).send({
         message: 'user not authorized',
