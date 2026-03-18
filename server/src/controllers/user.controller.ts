@@ -28,18 +28,6 @@ export const createUser = async (
       },
     });
 
-    const result = await prisma?.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
-
-    if (!result) {
-      res.status(404).send({
-        message: 'User not founded',
-      });
-    }
-
     res.status(200).send({
       message: 'User created with success!',
       userData: user,
@@ -52,8 +40,43 @@ export const createUser = async (
   }
 };
 
-export const findUser = async (
+export const loginUser = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {};
+) => {
+  try {
+    const { email, password } = req.body;
+
+    const result = await prisma?.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!result) {
+      res.status(404).send({
+        message: 'User not founded',
+      });
+
+      return;
+    }
+
+    const match = await bcrypt.compare(password, result.password);
+
+    if (match) {
+      res.status(200).send({
+        message: 'oi',
+      });
+      // login and generate JWT
+    } else {
+      res.status(401).send({
+        message: 'user not authorized',
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      messageError: error,
+    });
+  }
+};
