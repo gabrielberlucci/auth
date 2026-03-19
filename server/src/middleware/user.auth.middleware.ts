@@ -9,15 +9,20 @@ export const authMiddleware = (
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.status(403).send('Invalid token');
+    return;
   }
 
   try {
-    const token = authHeader?.split(' ')[1];
-    const decoded = jwt.verify(token!, process.env.JWT_SECRET as string);
+    const token = authHeader!.split(' ')[1];
+    console.log(token);
+
+    const decoded = jwt.verify(token!, process.env.JWT_SECRETE as string);
     (req as any).user = decoded;
 
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Token invalid or expired.' });
+    return res
+      .status(403)
+      .send({ message: 'Token invalid or expired.', error: error });
   }
 };
