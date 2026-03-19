@@ -4,4 +4,4 @@ import { Router } from 'express';
 
 export const postRouter: Router = Router();
 
-postRouter.get('/api/posts', authMiddleware, getUserPosts);
+postRouter.get('/', authMiddleware, getUserPosts);
