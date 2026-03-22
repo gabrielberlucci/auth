@@ -7,7 +7,7 @@ export const getUserPosts = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = req.user?.id;
 
     const posts = await prisma?.post.findMany({
       where: {
