@@ -8,13 +8,11 @@ export const authMiddleware = (
 ) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    res.status(403).send('Invalid token');
-    return;
+    return res.status(403).send('Invalid token');
   }
 
   try {
     const token = authHeader!.split(' ')[1];
-    console.log(token);
 
     const decoded = jwt.verify(token!, process.env.JWT_SECRETE as string);
     (req as any).user = decoded;
