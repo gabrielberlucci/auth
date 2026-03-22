@@ -6,6 +6,12 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
+  interface TokenPayload {
+    id: number;
+    email: string;
+    role: string;
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(403).send('Invalid token');
@@ -14,8 +20,12 @@ export const authMiddleware = (
   try {
     const token = authHeader!.split(' ')[1];
 
-    const decoded = jwt.verify(token!, process.env.JWT_SECRETE as string);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(
+      token!,
+      process.env.JWT_SECRETE as string,
+    ) as TokenPayload;
+
+    req.user = decoded;
 
     next();
   } catch (error) {
