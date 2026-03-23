@@ -12,17 +12,20 @@ export const authMiddleware = (
     role: string;
   }
 
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
+  const signedCookie = req.cookies;
+
+  if (!signedCookie.access_token) {
     return res.status(403).send('Invalid token');
   }
 
   try {
-    const token = authHeader!.split(' ')[1];
+    const token = signedCookie.access_token;
+
+    console.log(token);
 
     const decoded = jwt.verify(
       token!,
-      process.env.JWT_SECRETE as string,
+      process.env.JWT_SECRET as string,
     ) as TokenPayload;
 
     req.user = decoded;
